@@ -1,2 +1,2 @@
 # bbcs-2024
-LDSS
+LDSS (Legal Decision Support System)
