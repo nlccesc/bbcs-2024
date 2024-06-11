@@ -14,7 +14,6 @@ def eval_query(query):
 
 
 
-
 # frontend 
 
 
