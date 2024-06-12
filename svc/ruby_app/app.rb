@@ -15,7 +15,6 @@ end
 
 
 log_directory = ENV['RACK_ENV'] == 'test' ? './logs' : './logs'
-
 Dir.mkdir(log_directory) unless File.exist?(log_directory)
 
 log = JsonLogger.new(File.open("#{log_directory}/app.log", "a"))
@@ -23,6 +22,12 @@ log = JsonLogger.new(File.open("#{log_directory}/app.log", "a"))
 set :bind, '0.0.0.0'
 set :port, 4567
 
+before do
+  content_type :html
+  headers 'X-Frame-Options' => 'DENY',
+          'X-Content-Type-Options' => 'nosniff',
+          'X-XSS-Protection' => '1; mode=block'
+end
 
 get '/' do
   log.info("This is an info statement")
