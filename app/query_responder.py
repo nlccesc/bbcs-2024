@@ -1,6 +1,6 @@
-from google.cloud import storage
+#from google.cloud import storage
 import google.generativeai as genai
-from google.oauth2 import service_account
+#from google.oauth2 import service_account
 
 import os.path
 
@@ -42,5 +42,8 @@ model = genai.GenerativeModel(model_name='tunedModels/v6openaustralianlegalqa-gw
 
 
 def respond(query): 
-    return model.generate_content(query).text 
+    resp = model.generate_content(query) 
+    if resp.prompt_feedback.block_reason is not None: 
+        return "[Your question has been blocked for safety reasons]" 
+    return resp.text 
 
