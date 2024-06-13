@@ -1,33 +1,33 @@
 version: '3.8'
 
+networks:
+  app-network:
+    driver: bridge
+
 services:
-  svc1:
-    build: ./svc1
+  streamlit_app:
+    build:
+      context: ../../LDSS 2nd copy/app
     ports:
-      - "8000:8000"
-
-  svc2:
-    build: ./svc2
-    ports:
-      - "8002:8001"
-
-  ruby_app:
-    build: ./ruby_app
-    volumes:
-      - /c/Users/haoha/OneDrive/Desktop/personal/Projects/Personal/Hackathons/Building Blocs June Conference 2024/LDSS/svc/ruby_app/logs:/var/log/ruby_app
-    ports:
-      - "4567:4567"
+      - "8501:8501"
     logging:
       driver: "json-file"
       options:
         max-size: "200k"
         max-file: "10"
 
+  ruby_app:
+    build:
+      context: ./ruby_app 
+    volumes:
+      - ./ruby_app/logs:/var/log/ruby_app
+    ports:
+      - "4567:4567"
+
   prometheus:
     image: prom/prometheus
     volumes:
-      - /c/Users/haoha/OneDrive/Desktop/personal/Projects/Personal/Hackathons/Building Blocs June Conference 2024/LDSS/svc/prometheus.yaml:/etc/prometheus/prometheus.yaml
-      - /c/Users/haoha/OneDrive/Desktop/personal/Projects/Personal/Hackathons/Building Blocs June Conference 2024/LDSS/svc/alert.rules.yaml:/etc/prometheus/alert.rules.yaml
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yaml
     ports:
       - "9090:9090"
 
@@ -39,7 +39,7 @@ services:
   alertmanager:
     image: prom/alertmanager
     volumes:
-      - /c/Users/haoha/OneDrive/Desktop/personal/Projects/Personal/Hackathons/Building Blocs June Conference 2024/LDSS/svc/alertmanager.yaml:/etc/alertmanager/alertmanager.yaml
+      - ./alertmanager.yaml:/etc/alertmanager/alertmanager.yaml
     ports:
       - "9093:9093"
 
@@ -49,8 +49,6 @@ services:
       - discovery.type=single-node
     ports:
       - "9200:9200"
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
 
   logstash:
     image: docker.elastic.co/logstash/logstash:7.13.2
@@ -71,7 +69,7 @@ services:
     user: root
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - ./filebeat.yml:/usr/share/filebeat/filebeat.yaml:ro
+      - ./filebeat.yaml:/usr/share/filebeat/filebeat.yaml
     depends_on:
       - logstash
 
