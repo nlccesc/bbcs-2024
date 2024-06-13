@@ -31,10 +31,11 @@ Streamlit app: To run the app, go into the app directory, and enter in a termina
 
 Access the services: 
 Ruby App: http://localhost:4567 
-Service 1: http://localhost:8000 
-Service 2: http://localhost:8002 
+
 Prometheus: http://localhost:9090 
+
 Grafana: http://localhost:3000 
+
 Kibana: http://localhost:5601
 
 To run unit tests for the Ruby app:
