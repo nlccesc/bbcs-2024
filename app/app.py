@@ -4,10 +4,11 @@ import query_responder
 from threading import Thread
 from middleware import start_metrics_server
 import time
-import requests
+
+
 
 Thread(target=start_metrics_server, daemon=True).start()
-API_ENDPOINT = "http://your-api-endpoint.com/predict"
+
 
 if 'responses' not in st.session_state:
     st.session_state.responses = []
