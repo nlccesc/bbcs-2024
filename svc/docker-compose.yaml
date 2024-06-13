@@ -15,14 +15,18 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
+    networks:
+      - app-network
 
   ruby_app:
     build:
-      context: ./ruby_app 
+      context: ./ruby_app
     volumes:
       - ./ruby_app/logs:/var/log/ruby_app
     ports:
       - "4567:4567"
+    networks:
+      - app-network
 
   prometheus:
     image: prom/prometheus
@@ -30,11 +34,15 @@ services:
       - ./prometheus.yaml:/etc/prometheus/prometheus.yaml
     ports:
       - "9090:9090"
+    networks:
+      - app-network
 
   grafana:
     image: grafana/grafana
     ports:
       - "3000:3000"
+    networks:
+      - app-network
 
   alertmanager:
     image: prom/alertmanager
@@ -42,6 +50,8 @@ services:
       - ./alertmanager.yaml:/etc/alertmanager/alertmanager.yaml
     ports:
       - "9093:9093"
+    networks:
+      - app-network
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.13.2
@@ -49,6 +59,10 @@ services:
       - discovery.type=single-node
     ports:
       - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - app-network
 
   logstash:
     image: docker.elastic.co/logstash/logstash:7.13.2
@@ -56,6 +70,9 @@ services:
       - "5044:5044"
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline
+      - ./ruby_app/logs:/var/log/ruby_app
+    networks:
+      - app-network
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.13.2
@@ -63,6 +80,8 @@ services:
       - "5601:5601"
     environment:
       ELASTICSEARCH_URL: http://elasticsearch:9200
+    networks:
+      - app-network
 
   filebeat:
     image: docker.elastic.co/beats/filebeat:7.13.2
@@ -72,6 +91,8 @@ services:
       - ./filebeat.yaml:/usr/share/filebeat/filebeat.yaml
     depends_on:
       - logstash
+    networks:
+      - app-network
 
 volumes:
   esdata:
