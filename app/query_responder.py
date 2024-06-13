@@ -1,12 +1,15 @@
-#from google.cloud import storage
 import google.generativeai as genai
-#from google.oauth2 import service_account
-
 import os.path
+import logging
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
+from prometheus_client import Counter
+from middleware import REQUEST_TIME
+
+# Creating a new metric for counting requests
+REQUEST_COUNT = Counter('app_requests_count', 'Total web app requests')
 
 SCOPES = ['https://www.googleapis.com/auth/cloud-platform', 'https://www.googleapis.com/auth/generative-language.retriever', 'https://www.googleapis.com/auth/generative-language.tuning']
 
@@ -37,13 +40,14 @@ def load_creds():
 
 creds = load_creds()
 genai.configure(credentials = creds)
-
 model = genai.GenerativeModel(model_name='tunedModels/v6openaustralianlegalqa-gw6gupd21ufi')
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-def respond(query): 
-    resp = model.generate_content(query) 
-    if resp.prompt_feedback.block_reason is not None: 
-        return "[Your question has been blocked for safety reasons]" 
-    return resp.text 
 
+def respond(query):
+    with REQUEST_TIME.time():
+        response = model.generate_content(query).text
+        REQUEST_COUNT.inc()
+        return response
