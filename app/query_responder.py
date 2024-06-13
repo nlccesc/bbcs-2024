@@ -1,6 +1,3 @@
-import os
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'bbcs24_responder_key.json'
-os.environ['API_KEY'] = 'AIzaSyDDM1XPXjqHsAL6pjHrOZc1gBeYVyF_Sw0'
 from google.cloud import storage
 import google.generativeai as genai
 from google.oauth2 import service_account
