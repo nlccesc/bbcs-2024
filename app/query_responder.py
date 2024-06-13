@@ -47,7 +47,14 @@ logger = logging.getLogger(__name__)
 
 
 def respond(query):
-    with REQUEST_TIME.time():
-        response = model.generate_content(query).text
-        REQUEST_COUNT.inc()
-        return response
+    try:
+        with REQUEST_TIME.time():
+            response = model.generate_content(query)
+            if not response.parts:  # Check if the response contains valid Parts
+                raise ValueError("No valid response parts found.")
+            response_text = response.text
+            REQUEST_COUNT.inc()
+            return response_text
+    except Exception as e:
+        logger.error(f"Failed to generate content: {e}")
+        return "An error occurred while generating the response."
